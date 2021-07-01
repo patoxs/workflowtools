@@ -18,6 +18,6 @@ El tiempo en que lo saludamos.
 
 ## Example usage
 
-uses: actions/hello-world-javascript-action@v1.1
+uses: patoxs/workflowtools@main
 with:
   who-to-greet: 'Mona the Octocat'
