@@ -1,10 +1,30 @@
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: 'WorkFlow Tools'
+description: 'Tools for deploy app using runner seft-hosted to infra AWS'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  action:  
+    description: 'Acción que define que actividad realizar'
     required: true
-    default: 'World'
+    default: 'default'
+  origin:  
+    description: 'Directorio origen'
+    required: false
+    default: 'public'
+  destiny:  
+    description: 'Directorio destino'
+    required: false
+    default: 'artefactos'
+  cluster:  
+    description: 'Nombre cluster K8s'
+    required: false
+    default: 'nombre-cluster'
+  namespace:  
+    description: 'Namespace app'
+    required: false
+    default: 'nombre-namespace'
+  region:  
+    description: 'Region aws'
+    required: false
+    default: 'us-west-1'
 outputs:
   time: # id of output
     description: 'The time we greeted you'
