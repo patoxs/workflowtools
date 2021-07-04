@@ -73,8 +73,8 @@ try {
   if (a == "copyArtifacts") {copyDirectory(o,d)}
   if (a == "confK8S") {confK8S(c,n,r)}
   // Get the JSON webhook payload for the event that triggered the workflow
-  // const payload = JSON.stringify(github.context.payload, undefined, 2)
   if (a == "default"){
+    const payload = JSON.stringify(github.context.payload, undefined, 2)
     console.log(`The event payload: ${payload.repository.name}`);
     console.log(process.env);
   }
