@@ -4,7 +4,8 @@ const AWS = require('aws-sdk');
 const sts = new AWS.STS();
 const {promisify} = require('util');
 const {exec} = require('child_process');
-const execAsync = promisify(exec);
+const execAsync = promisify(exec)
+const payload = JSON.stringify(github.context.payload, undefined, 2);
 const sequentialExecution = async (...commands) => {
   if (commands.length === 0) {
     return 0;
@@ -74,8 +75,7 @@ try {
   if (a == "confK8S") {confK8S(c,n,r)}
   // Get the JSON webhook payload for the event that triggered the workflow
   if (a == "default"){
-    const payload = JSON.stringify(github.context.payload, undefined, 2)
-    console.log(`The event payload: ${payload.repository.name}`);
+    console.log(payload.repository.name);
     console.log(process.env);
   }
   
