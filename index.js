@@ -73,9 +73,13 @@ try {
   core.setOutput("time", time);
   if (a == "copyArtifacts") {copyDirectory(o,d)}
   if (a == "confK8S") {confK8S(c,n,r)}
-  // Get the JSON webhook payload for the event that triggered the workflow
   if (a == "default"){
-    console.log(payload.repository.name);
+    console.log("github_repository ${GITHUB_REPOSITORY}");
+    console.log("github_actor ${GITHUB_ACTOR}");
+    console.log("github_event_name ${GITHUB_EVENT_NAME}");
+    console.log("github_ref ${GITHUB_REF}");
+    console.log("github_head_ref ${GITHUB_HEAD_REF}");
+    console.log("github_base_ref ${GITHUB_BASE_REF}");
     console.log(process.env);
   }
   
