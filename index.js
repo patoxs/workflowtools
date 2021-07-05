@@ -45,7 +45,7 @@ function confK8S(c, n){
   }
 }
 
-async function uploadKanikoECR(branch, tag, app_name) {
+const uploadKanikoECR = async function(branch, tag, app_name) {
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   var sa = process.env.SERVICE_ACCOUNT;
@@ -56,9 +56,10 @@ async function uploadKanikoECR(branch, tag, app_name) {
         --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ app_name +":"+ tag +" \
         --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ app_name +":latest --git=branch="+ branch +" "
   sequentialExecution( command );
+  return true;
 }
 
-function deployK8s(tag, app_name, n){
+const deployK8s = async function(tag, app_name, n){
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   sequentialExecution(
