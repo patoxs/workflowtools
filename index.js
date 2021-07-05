@@ -47,7 +47,7 @@ function confK8S(c, n){
 
 async function uploadKanikoECR(branch, tag, app_name) {
   const identity = await sts.getCallerIdentity().promise();
-  const ai = i.Account;
+  const ai = identity.Account;
   var sa = process.env.SERVICE_ACCOUNT;
   console.log("repo" + app_name);
   var command = "kubectl run --rm kaniko-"+ app_name +"-"+ tag +" --attach=true --image=gcr.io/kaniko-project/executor:latest --serviceaccount="+ sa +" --restart=Never -- \
@@ -60,7 +60,7 @@ async function uploadKanikoECR(branch, tag, app_name) {
 
 function deployK8s(tag, app_name, n){
   const identity = await sts.getCallerIdentity().promise();
-  const ai = i.Account;
+  const ai = identity.Account;
   sequentialExecution(
     "kubectl set image --record deployment.apps/php php="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ app_name +":"+ tag +" -n "+ n,
     "kubectl rollout status deployment.apps/php -n "+ n,
