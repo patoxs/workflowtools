@@ -13,18 +13,15 @@ inputs:
     description: 'Directorio destino'
     required: false
     default: 'artefactos'
-  cluster:  
-    description: 'Nombre cluster K8s'
-    required: false
-    default: 'nombre-cluster'
+  
   namespace:  
     description: 'Namespace app'
     required: false
     default: 'nombre-namespace'
-  region:  
-    description: 'Region aws'
+  branch:  
+    description: 'Branch deploy'
     required: false
-    default: 'us-west-1'
+    default: 'devel'
 outputs:
   time: # id of output
     description: 'The time we greeted you'
