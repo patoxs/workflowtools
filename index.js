@@ -45,7 +45,7 @@ function confK8S(c, n){
   }
 }
 
-function uploadKanikoECR(branch, tag, app_name) {
+async function uploadKanikoECR(branch, tag, app_name) {
   const identity = await sts.getCallerIdentity().promise();
   const ai = i.Account;
   var sa = process.env.SERVICE_ACCOUNT;
