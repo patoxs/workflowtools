@@ -34,11 +34,17 @@ function copyDirectory(o,d){
   }
 }
 
-function confK8S(c, n){
+const ConfK8SPushEcr = async function(c, n, branch, tag, app_name, repo){
+  var kaniko = "kubectl run --rm kaniko-"+ app_name +"-"+ tag +" --attach=true --image=gcr.io/kaniko-project/executor:latest --serviceaccount="+ sa +" --restart=Never -- \
+        --verbosity=info \
+        --context=git://"+ process.env.TOKEN +"@github.com/"+ app_name +" \
+        --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ tag +" \
+        --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":latest --git=branch="+ branch +" "
   try {
     sequentialExecution(
       "aws eks update-kubeconfig --name "+ c +" --region "+ process.env.REGION,
       "kubectl config set-context --current --namespace="+n,
+      kaniko
     );
     return true;
   } catch (error) {
@@ -46,18 +52,7 @@ function confK8S(c, n){
   }
 }
 
-const uploadKanikoECR = async function(branch, tag, app_name, repo) {
-  const identity = await sts.getCallerIdentity().promise();
-  const ai = identity.Account;
-  var sa = process.env.SERVICE_ACCOUNT;
-  var command = "kubectl run --rm kaniko-"+ app_name +"-"+ tag +" --attach=true --image=gcr.io/kaniko-project/executor:latest --serviceaccount="+ sa +" --restart=Never -- \
-        --verbosity=info \
-        --context=git://"+ process.env.TOKEN +"@github.com/"+ app_name +" \
-        --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ tag +" \
-        --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":latest --git=branch="+ branch +" "
-  sequentialExecution( command );
-  return true;
-}
+
 
 const deployK8s = async function(tag, app_name, n, repo){
   const identity = await sts.getCallerIdentity().promise();
@@ -114,8 +109,7 @@ try {
   const time = (new Date()).toTimeString();
   core.setOutput("time", time);
   if (a == "copyArtifacts") {copyDirectory(o,d)}
-  if (a == "confK8S") {confK8S(c,n)}
-  if (a == "pushECR") {uploadKanikoECR(b,tag,an, r)}
+  if (a == "ConfPushECR") {ConfK8SPushEcr(c, n, b, tag, an, r)}
   if (a == "deployK8s") {deployK8s(tag,an,n, r)}
   if (a == "default"){
     console.log(process.env);
