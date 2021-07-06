@@ -35,12 +35,12 @@ function copyDirectory(o,d){
   }
 }
 
-const ConfK8SPushEcr = async function(c, n, branch, tag, app_name, repo){
+const ConfK8SPushEcr = async function(c, n, branch, tag, app_name, repo, tg){
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   var kaniko = "kubectl run --rm kaniko-"+ app_name +"-"+ tag +" --attach=true --image=gcr.io/kaniko-project/executor:latest --serviceaccount="+ process.env.SERVICE_ACCOUNT +" --restart=Never -- \
         --verbosity=info \
-        --context=git://"+ process.env.TOKEN_GITHUB +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
+        --context=git://"+ tg +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
         --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ tag +" \
         --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":latest --git=branch="+ branch
   try {
@@ -84,6 +84,7 @@ const deployK8s = async function(tag, n, repo){
             // branch: 'name_branch'
             // app_name: 'app_name_or_ecr_name'          
             // repo: 'name_repo'
+            // token_github: 'token_'
   // - name: Deploy to K8s
   //       uses: patoxs/workflowtools@main
   //       with: 
@@ -103,12 +104,13 @@ try {
   const b = core.getInput('branch', { required: false });
   const an = core.getInput('app_name', { required: false });
   const r = core.getInput('repo', { required: false });
+  const tg = core.getInput('token', { required: false });
 
   console.log(`ACTION: ${a}!`);
   const time = (new Date()).toTimeString();
   core.setOutput("time", time);
   if (a == "copyArtifacts") {copyDirectory(o,d)}
-  if (a == "ConfPushECR") {ConfK8SPushEcr(c, n, b, tag, an, r)}
+  if (a == "ConfPushECR") {ConfK8SPushEcr(c, n, b, tag, an, r, tg)}
   if (a == "deployK8s") {deployK8s(tag,n, r)}
   if (a == "default"){
     console.log(process.env);

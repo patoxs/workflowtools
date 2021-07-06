@@ -29,6 +29,10 @@ inputs:
     description: 'Name repo'
     required: false
     default: 'ecr'
+  token:  
+    description: 'Token github'
+    required: false
+    default: 'xxxxxxx'
 outputs:
   time: # id of output
     description: 'The time we greeted you'
