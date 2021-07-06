@@ -13,7 +13,6 @@ inputs:
     description: 'Directorio destino'
     required: false
     default: 'artefactos'
-  
   namespace:  
     description: 'Namespace app'
     required: false

@@ -115,8 +115,8 @@ try {
   core.setOutput("time", time);
   if (a == "copyArtifacts") {copyDirectory(o,d)}
   if (a == "confK8S") {confK8S(c,n)}
-  if (a == "pushECR") {uploadKanikoECR(b,tag,an, repo)}
-  if (a == "deployK8s") {deployK8s(tag,an,n, repo)}
+  if (a == "pushECR") {uploadKanikoECR(b,tag,an, r)}
+  if (a == "deployK8s") {deployK8s(tag,an,n, r)}
   if (a == "default"){
     console.log(process.env);
   }
