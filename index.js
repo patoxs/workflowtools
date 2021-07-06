@@ -117,7 +117,6 @@ try {
   if (a == "pushECR") {uploadKanikoECR(b,tag,an)}
   if (a == "deployK8s") {deployK8s(tag,an,n)}
   if (a == "default"){
-    console.log(${payload});
     console.log(process.env);
   }
   
