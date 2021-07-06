@@ -2,6 +2,7 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const AWS = require('aws-sdk');
 const sts = new AWS.STS();
+const uuid = require('uuid');
 const {promisify} = require('util');
 const {exec} = require('child_process');
 const execAsync = promisify(exec)
