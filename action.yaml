@@ -22,6 +22,14 @@ inputs:
     description: 'Branch deploy'
     required: false
     default: 'devel'
+  app_name:  
+    description: 'Name app'
+    required: false
+    default: 'app'
+  repo:  
+    description: 'Name repo'
+    required: false
+    default: 'ecr'
 outputs:
   time: # id of output
     description: 'The time we greeted you'

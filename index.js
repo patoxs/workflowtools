@@ -46,25 +46,24 @@ function confK8S(c, n){
   }
 }
 
-const uploadKanikoECR = async function(branch, tag, app_name) {
+const uploadKanikoECR = async function(branch, tag, app_name, repo) {
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   var sa = process.env.SERVICE_ACCOUNT;
-  console.log("repo" + app_name);
   var command = "kubectl run --rm kaniko-"+ app_name +"-"+ tag +" --attach=true --image=gcr.io/kaniko-project/executor:latest --serviceaccount="+ sa +" --restart=Never -- \
         --verbosity=info \
         --context=git://"+ process.env.TOKEN +"@github.com/"+ app_name +" \
-        --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ app_name +":"+ tag +" \
-        --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ app_name +":latest --git=branch="+ branch +" "
+        --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ tag +" \
+        --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":latest --git=branch="+ branch +" "
   sequentialExecution( command );
   return true;
 }
 
-const deployK8s = async function(tag, app_name, n){
+const deployK8s = async function(tag, app_name, n, repo){
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   sequentialExecution(
-    "kubectl set image --record deployment.apps/php php="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ app_name +":"+ tag +" -n "+ n,
+    "kubectl set image --record deployment.apps/php php="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ tag +" -n "+ n,
     "kubectl rollout status deployment.apps/php -n "+ n,
   );
   return true;        
@@ -109,14 +108,15 @@ try {
   const n = core.getInput('namespace', { required: false });
   const b = core.getInput('branch', { required: false });
   const an = core.getInput('app_name', { required: false });
+  const r = core.getInput('repo', { required: false });
 
   console.log(`ACTION: ${a}!`);
   const time = (new Date()).toTimeString();
   core.setOutput("time", time);
   if (a == "copyArtifacts") {copyDirectory(o,d)}
   if (a == "confK8S") {confK8S(c,n)}
-  if (a == "pushECR") {uploadKanikoECR(b,tag,an)}
-  if (a == "deployK8s") {deployK8s(tag,an,n)}
+  if (a == "pushECR") {uploadKanikoECR(b,tag,an, repo)}
+  if (a == "deployK8s") {deployK8s(tag,an,n, repo)}
   if (a == "default"){
     console.log(process.env);
   }
