@@ -13,6 +13,7 @@ const sequentialExecution = async (...commands) => {
   }
 
   const {stderr} = await execAsync(commands.shift());
+  console.log(stderr);
   if (stderr) {
     throw stderr;
   }
@@ -50,7 +51,7 @@ const ConfK8SPushEcr = async function(c, n, branch, tag, app_name, repo){
     );
     return true;
   } catch (error) {
-    core.setFailed("Error at copy");
+    core.setFailed("Error push to ECR");
   }
 }
 
@@ -76,17 +77,14 @@ const deployK8s = async function(tag, app_name, n, repo){
   //         action: 'copyArtifacts' 
   //         origin: 'path/directory/origin' 
   //         destiny: 'path/directory/destiny'
-  // - name: configue k8s in runner
-  //       uses: patoxs/workflowtools@main
-  //       with: 
-  //         action: 'confK8S'
-  //         namespace: 'name_namespace'
   // - name: Upload image to ECR
   //       uses: patoxs/workflowtools@main
   //       with: 
-  //         action: 'pushECR'
-  //         branch: 'branch_to_deploy'
-  //         app_name: 'app_name_or_ecr_name'
+  //         action: 'ConfPushECR'
+            // namespace: 'name_namespace'
+            // branch: 'name_branch'
+            // app_name: 'app_name_or_ecr_name'          
+            // repo: 'name_repo'
   // - name: Deploy to K8s
   //       uses: patoxs/workflowtools@main
   //       with: 
