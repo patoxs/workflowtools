@@ -40,7 +40,7 @@ const ConfK8SPushEcr = async function(c, n, branch, tag, app_name, repo){
   const ai = identity.Account;
   var kaniko = "kubectl run --rm kaniko-"+ app_name +"-"+ tag +" --attach=true --image=gcr.io/kaniko-project/executor:latest --serviceaccount="+ process.env.SERVICE_ACCOUNT +" --restart=Never -- \
         --verbosity=info \
-        --context=git://"+ process.env.TOKEN +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
+        --context=git://"+ process.env.TOKEN_GITHUB +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
         --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ tag +" \
         --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":latest --git=branch="+ branch
   try {
