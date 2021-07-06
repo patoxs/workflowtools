@@ -57,7 +57,7 @@ const ConfK8SPushEcr = async function(c, n, branch, tag, app_name, repo){
 
 
 
-const deployK8s = async function(tag, app_name, n, repo){
+const deployK8s = async function(tag, n, repo){
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   sequentialExecution(
@@ -110,7 +110,7 @@ try {
   core.setOutput("time", time);
   if (a == "copyArtifacts") {copyDirectory(o,d)}
   if (a == "ConfPushECR") {ConfK8SPushEcr(c, n, b, tag, an, r)}
-  if (a == "deployK8s") {deployK8s(tag,an,n, r)}
+  if (a == "deployK8s") {deployK8s(tag,n, r)}
   if (a == "default"){
     console.log(process.env);
   }
