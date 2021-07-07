@@ -5,11 +5,11 @@ inputs:
     description: 'Acción que define que actividad realizar'
     required: true
     default: 'default'
-  origin:  
+  origen:  
     description: 'Directorio origen'
     required: false
     default: 'public'
-  destiny:  
+  destino:  
     description: 'Directorio destino'
     required: false
     default: 'artefactos'

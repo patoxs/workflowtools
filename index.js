@@ -96,8 +96,8 @@ try {
   var gr = process.env.GITHUB_REPOSITORY;
   var c = process.env.CLUSTER;
   const a = core.getInput('action', { required: true });
-  const o = core.getInput('origin', { required: false });
-  const d = core.getInput('destiny', { required: false });
+  const o = core.getInput('origen', { required: false });
+  const d = core.getInput('destino', { required: false });
   const n = core.getInput('namespace', { required: false });
   const b = core.getInput('branch', { required: false });
   const an = core.getInput('app_name', { required: false });
