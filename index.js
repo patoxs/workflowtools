@@ -38,15 +38,14 @@ function copyDirectory(o,d){
 const ConfK8SPushEcr = async function(c, n, branch, tag, app_name, repo, tg){
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
-  var kaniko = "kubectl run --rm kaniko-"+ app_name +"-"+ tag +" --attach=true --image=gcr.io/kaniko-project/executor:latest --serviceaccount="+ process.env.SERVICE_ACCOUNT +" --restart=Never -- \
+  try {
+    sequentialExecution(
+      "aws eks update-kubeconfig --name "+ c +" --region "+ process.env.REGION,
+      "kubectl run --rm kaniko-"+ app_name +"-"+ tag +" --attach=true --image=gcr.io/kaniko-project/executor:latest --serviceaccount="+ process.env.SERVICE_ACCOUNT +" --restart=Never -- \
         --verbosity=info \
         --context=git://"+ tg +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
         --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ tag +" \
         --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":latest --git=branch="+ branch
-  try {
-    sequentialExecution(
-      "aws eks update-kubeconfig --name "+ c +" --region "+ process.env.REGION,
-      kaniko
     );
     return true;
   } catch (error) {
