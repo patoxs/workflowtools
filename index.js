@@ -35,16 +35,19 @@ function copyDirectory(o,d){
   }
 }
 
-const ConfK8SPushEcr = async function(c, n, branch, tag, app_name, repo, tg){
+const ConfK8SPushEcr = async function(c, n, branch, app_name, repo, tg){
+  process.env['tag'] = hash();
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   try {
     sequentialExecution(
       "aws eks update-kubeconfig --name "+ c +" --region "+ process.env.REGION,
-      "kubectl run --rm kaniko-"+ app_name +"-"+ tag +" --attach=true --image=gcr.io/kaniko-project/executor:latest --serviceaccount="+ process.env.SERVICE_ACCOUNT +" --restart=Never -- \
-        --verbosity=info \
+      "kubectl run --rm kaniko-"+ app_name +"-"+ process.env.tag +" --attach=true --image=gcr.io/kaniko-project/executor:latest \
+        --serviceaccount="+ process.env.SERVICE_ACCOUNT +" --restart=Never -- \
+        --verbosity=debug \
         --context=git://"+ tg +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
-        --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ tag +" \
+        --context=git://"+ tg +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
+        --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ process.env.tag +" \
         --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":latest --git=branch="+ branch
     );
     return true;
@@ -53,13 +56,11 @@ const ConfK8SPushEcr = async function(c, n, branch, tag, app_name, repo, tg){
   }
 }
 
-
-
-const deployK8s = async function(tag, n, repo){
+const deployK8s = async function(n, repo){
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   sequentialExecution(
-    "kubectl set image --record deployment.apps/php php="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ tag +" -n "+ n,
+    "kubectl set image --record deployment.apps/php php="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ process.env.tag +" -n "+ n,
     "kubectl rollout status deployment.apps/php -n "+ n,
   );
   return true;        
@@ -92,8 +93,6 @@ const deployK8s = async function(tag, n, repo){
   //         namespace: 'name_namespace'
 
 try {
-
-  const tag = hash();
   var gr = process.env.GITHUB_REPOSITORY;
   var c = process.env.CLUSTER;
   const a = core.getInput('action', { required: true });
@@ -109,12 +108,11 @@ try {
   const time = (new Date()).toTimeString();
   core.setOutput("time", time);
   if (a == "copyArtifacts") {copyDirectory(o,d)}
-  if (a == "ConfPushECR") {ConfK8SPushEcr(c, n, b, tag, an, r, tg)}
-  if (a == "deployK8s") {deployK8s(tag,n, r)}
+  if (a == "ConfPushECR") {ConfK8SPushEcr(c, n, b, an, r, tg)}
+  if (a == "deployK8s") {deployK8s(n, r)}
   if (a == "default"){
     console.log(process.env);
   }
-  
 } catch (error) {
   core.setFailed(error.message);
 }
