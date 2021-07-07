@@ -13,7 +13,6 @@ const sequentialExecution = async (...commands) => {
   }
 
   const {stderr} = await execAsync(commands.shift());
-  console.log(stderr);
   if (stderr) {
     throw stderr;
   }
@@ -36,18 +35,18 @@ function copyDirectory(o,d){
 }
 
 const ConfK8SPushEcr = async function(c, n, branch, app_name, repo, tg){
-  process.env['tag'] = hash();
+  const tag = process.env.GITHUB_SHA.slice(4, 14);
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   try {
     sequentialExecution(
       "aws eks update-kubeconfig --name "+ c +" --region "+ process.env.REGION,
-      "kubectl run --rm kaniko-"+ app_name +"-"+ process.env.tag +" --attach=true --image=gcr.io/kaniko-project/executor:latest \
+      "kubectl run --rm kaniko-"+ app_name +"-"+ tag +" --attach=true --image=gcr.io/kaniko-project/executor:latest \
         --serviceaccount="+ process.env.SERVICE_ACCOUNT +" --restart=Never -- \
         --verbosity=debug \
         --context=git://"+ tg +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
         --context=git://"+ tg +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
-        --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ process.env.tag +" \
+        --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ tag +" \
         --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":latest --git=branch="+ branch
     );
     return true;
@@ -57,10 +56,11 @@ const ConfK8SPushEcr = async function(c, n, branch, app_name, repo, tg){
 }
 
 const deployK8s = async function(n, repo){
+  const tag = process.env.GITHUB_SHA.slice(4, 14);
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   sequentialExecution(
-    "kubectl set image --record deployment.apps/php php="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ process.env.tag +" -n "+ n,
+    "kubectl set image --record deployment.apps/php php="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ tag +" -n "+ n,
     "kubectl rollout status deployment.apps/php -n "+ n,
   );
   return true;        
