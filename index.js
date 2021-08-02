@@ -55,13 +55,13 @@ const ConfK8SPushEcr = async function(c, n, branch, app_name, repo, tg){
   }
 }
 
-const deployK8s = async function(n, repo){
+const deployK8s = async function(n, repo, de){
   const tag = process.env.GITHUB_SHA.slice(4, 14);
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   sequentialExecution(
-    "kubectl set image --record deployment.apps/php php="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ tag +" -n "+ n,
-    "kubectl rollout status deployment.apps/php -n "+ n,
+    "kubectl set image --record deployment.apps/"+ de +" "+ de +"="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ tag +" -n "+ n,
+    "kubectl rollout status deployment.apps/"+ de +" -n "+ n,
   );
   return true;        
 }
@@ -103,13 +103,14 @@ try {
   const an = core.getInput('app_name', { required: false });
   const r = core.getInput('repo', { required: false });
   const tg = core.getInput('token', { required: false });
+  const de = core.getInput('deployment', { required: false });
 
   console.log(`ACTION: ${a}!`);
   const time = (new Date()).toTimeString();
   core.setOutput("time", time);
   if (a == "copyArtifacts") {copyDirectory(o,d)}
   if (a == "ConfPushECR") {ConfK8SPushEcr(c, n, b, an, r, tg)}
-  if (a == "deployK8s") {deployK8s(n, r)}
+  if (a == "deployK8s") {deployK8s(n, r, de)}
   if (a == "default"){
     console.log(process.env);
   }

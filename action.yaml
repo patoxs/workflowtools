@@ -33,6 +33,10 @@ inputs:
     description: 'Token github'
     required: false
     default: 'xxxxxxx'
+  deployment:  
+    description: 'Name deployment'
+    required: false
+    default: 'xxxxxxx'
 outputs:
   time: # id of output
     description: 'The time we greeted you'
