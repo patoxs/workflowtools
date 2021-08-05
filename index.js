@@ -47,7 +47,7 @@ const ConfK8SPushEcr = async function(c, n, branch, app_name, repo, tg){
         --context=git://"+ tg +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
         --context=git://"+ tg +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
         --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ tag +" \
-        --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":latest --git="+ branch
+        --destination="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":latest --git=branch="+ branch
     );
     return true;
   } catch (error) {
