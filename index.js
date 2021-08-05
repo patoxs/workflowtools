@@ -60,7 +60,7 @@ const deployK8s = async function(n, repo, de){
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   sequentialExecution(
-    "kubectl set image --record deployment.apps/"+ de +" "+ de +"="+ ai +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ tag +" -n "+ n,
+    "kubectl set image --record deployment.apps/"+ de +" "+ de +"="+ ai +".dkr.ecr.us-east-1.amazonaws.com/"+ repo +":"+ tag +" -n "+ n,
     "kubectl rollout status deployment.apps/"+ de +" -n "+ n,
   );
   return true;        
