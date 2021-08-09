@@ -35,6 +35,7 @@ function copyDirectory(o,d){
 }
 
 const ConfK8SPushEcr = async function(c, n, branch, app_name, repo, tg, tag){
+  const tag = tag.slice(4, 14);
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   try {
@@ -55,6 +56,7 @@ const ConfK8SPushEcr = async function(c, n, branch, app_name, repo, tg, tag){
 }
 
 const deployK8s = async function(n, repo, de, tag){
+  const tag = tag.slice(4, 14);
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   sequentialExecution(
