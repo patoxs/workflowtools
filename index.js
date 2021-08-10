@@ -34,7 +34,7 @@ function copyDirectory(o,d){
   }
 }
 
-const ConfK8SPushEcr = async function(c, n, branch, app_name, repo, tg, tag){
+const ConfK8SPushEcr = async function(c, n, branch, app_name, repo, tg){
   const tag = process.env.GITHUB_SHA.slice(4, 14);
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
@@ -55,7 +55,7 @@ const ConfK8SPushEcr = async function(c, n, branch, app_name, repo, tg, tag){
   }
 }
 
-const deployK8s = async function(n, repo, de, tag){
+const deployK8s = async function(n, repo, de){
   const tag = process.env.GITHUB_SHA.slice(4, 14);
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
@@ -110,8 +110,8 @@ try {
   const time = (new Date()).toTimeString();
   core.setOutput("time", time);
   if (a == "copyArtifacts") {copyDirectory(o,d)}
-  if (a == "ConfPushECR") {ConfK8SPushEcr(c, n, b, an, r, tg, tag)}
-  if (a == "deployK8s") {deployK8s(n, r, de, tag)}
+  if (a == "ConfPushECR") {ConfK8SPushEcr(c, n, b, an, r, tg)}
+  if (a == "deployK8s") {deployK8s(n, r, de)}
   if (a == "default"){
     console.log(process.env);
   }
