@@ -35,7 +35,7 @@ function copyDirectory(o,d){
 }
 
 const ConfK8SPushEcr = async function(c, n, branch, app_name, repo, tg, tag){
-  tag = tag.slice(4, 14);
+  const tag = process.env.GITHUB_SHA.slice(4, 14);
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   try {
@@ -56,7 +56,7 @@ const ConfK8SPushEcr = async function(c, n, branch, app_name, repo, tg, tag){
 }
 
 const deployK8s = async function(n, repo, de, tag){
-  tag = tag.slice(4, 14);
+  const tag = process.env.GITHUB_SHA.slice(4, 14);
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   sequentialExecution(
