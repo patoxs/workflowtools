@@ -30,7 +30,7 @@ function copyDirectory(o,d){
     sequentialExecution(command);
     return true;
   } catch (error) {
-    core.setFailed("Error at copy");
+    core.setFailed(error.message);
   }
 }
 
@@ -46,12 +46,13 @@ const ConfK8SPushEcr = async function(c, n, branch, app_name, repo, tg){
         --verbosity=debug \
         --context=git://"+ tg +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
         --context=git://"+ tg +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
-        --destination="+ ai +".dkr.ecr.us-east-1.amazonaws.com/"+ repo +":"+ tag +" \
-        --destination="+ ai +".dkr.ecr.us-east-1.amazonaws.com/"+ repo +":latest --git=branch="+ branch
+        --destination="+ ai +".dkr.ecr."+ process.env.REGION +".amazonaws.com/"+ repo +":"+ tag +" \
+        --destination="+ ai +".dkr.ecr."+ process.env.REGION +".amazonaws.com/"+ repo +":latest --git=branch="+ branch
     );
     return true;
   } catch (error) {
-    core.setFailed("Error push to ECR");
+    core.setFailed(error.message);
+    return false;
   }
 }
 
@@ -60,7 +61,7 @@ const deployK8s = async function(n, repo, de){
   const identity = await sts.getCallerIdentity().promise();
   const ai = identity.Account;
   sequentialExecution(
-    "kubectl set image --record deployment.apps/"+ de +" "+ de +"="+ ai +".dkr.ecr.us-east-1.amazonaws.com/"+ repo +":"+ tag +" -n "+ n,
+    "kubectl set image --record deployment.apps/"+ de +" "+ de +"="+ ai +".dkr.ecr."+ process.env.REGION +".amazonaws.com/"+ repo +":"+ tag +" -n "+ n,
     "kubectl rollout status deployment.apps/"+ de +" -n "+ n,
   );
   return true;        
@@ -104,7 +105,6 @@ try {
   const r = core.getInput('repo', { required: false });
   const tg = core.getInput('token', { required: false });
   const de = core.getInput('deployment', { required: false });
-  const tag = core.getInput('tag', { required: false });
 
   console.log(`ACTION: ${a}!`);
   const time = (new Date()).toTimeString();
