@@ -34,6 +34,25 @@ function copyDirectory(o,d){
   }
 }
 
+const ToECR = async function(github_ref, cluster, app_name, token, repo, branch){
+  const identity = await sts.getCallerIdentity().promise();
+  const id_count = identity.Account;
+  try {
+    sequentialExecution(
+      "aws eks update-kubeconfig --name "+ cluster +" --region "+ process.env.REGION,
+      "kubectl run --rm kaniko-"+ app_name +"-"+ github_ref +" --attach=true --image=gcr.io/kaniko-project/executor:latest \
+        --serviceaccount="+ process.env.SERVICE_ACCOUNT +" --restart=Never -- \
+        --verbosity=info \
+        --context=git://"+ token +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
+        --destination="+ id_count +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ github_ref +" \
+        --destination="+ id_count +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":latest --git=branch="+ branch
+    );
+    return true;
+  } catch (error) {
+    core.setFailed("Error push to ECR");
+  }
+}
+
 const ConfK8SPushEcr = async function(c, n, branch, app_name, repo, tg){
   const tag = process.env.GITHUB_SHA.slice(4, 14);
   const identity = await sts.getCallerIdentity().promise();
@@ -66,51 +85,26 @@ const deployK8s = async function(n, repo, de){
   return true;        
 }
 
-  // - name: default
-  //       uses: patoxs/workflowtools@main
-  //       with: 
-  //         action: 'default'
-  // - name: copy to artifacts
-  //       uses: patoxs/workflowtools@main
-  //       with: 
-  //         action: 'copyArtifacts' 
-  //         origin: 'path/directory/origin' 
-  //         destiny: 'path/directory/destiny'
-  // - name: Upload image to ECR
-  //       uses: patoxs/workflowtools@main
-  //       with: 
-  //         action: 'ConfPushECR'
-            // namespace: 'name_namespace'
-            // branch: 'name_branch'
-            // app_name: 'app_name_or_ecr_name'          
-            // repo: 'name_repo'
-            // token_github: 'token_'
-  // - name: Deploy to K8s
-  //       uses: patoxs/workflowtools@main
-  //       with: 
-  //         action: 'deployK8s'
-  //         app_name: 'app_name_or_ecr_name'
-  //         namespace: 'name_namespace'
-
 try {
-  var gr = process.env.GITHUB_REPOSITORY;
-  var c = process.env.CLUSTER;
-  const a = core.getInput('action', { required: true });
-  const o = core.getInput('origen', { required: false });
-  const d = core.getInput('destino', { required: false });
-  const n = core.getInput('namespace', { required: false });
-  const b = core.getInput('branch', { required: false });
-  const an = core.getInput('app_name', { required: false });
-  const r = core.getInput('repo', { required: false });
-  const tg = core.getInput('token', { required: false });
-  const de = core.getInput('deployment', { required: false });
+  var gr           = process.env.GITHUB_REPOSITORY;
+  var c            = process.env.CLUSTER;
+  const a          = core.getInput('action', { required: true });
+  const o          = core.getInput('origen', { required: false });
+  const d          = core.getInput('destino', { required: false });
+  const n          = core.getInput('namespace', { required: false });
+  const b          = core.getInput('branch', { required: false });
+  const an         = core.getInput('app_name', { required: false });
+  const r          = core.getInput('repo', { required: false });
+  const tg         = core.getInput('token', { required: false });
+  const de         = core.getInput('deployment', { required: false });
+  const github_ref = core.getInput('github_ref'. { required: false});
 
-  console.log(`ACTION: ${a}!`);
   const time = (new Date()).toTimeString();
   core.setOutput("time", time);
   if (a == "copyArtifacts") {copyDirectory(o,d)}
   if (a == "ConfPushECR") {ConfK8SPushEcr(c, n, b, an, r, tg)}
   if (a == "deployK8s") {deployK8s(n, r, de)}
+  if (a == "ToECR") {ToECR(github_ref, c, an, tg, r, b)}
   if (a == "default"){
     console.log(process.env);
   }
