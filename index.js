@@ -87,25 +87,25 @@ const deployK8s = async function(n, repo, de){
 }
 
 try {
-  var gr           = process.env.GITHUB_REPOSITORY;
-  var c            = process.env.CLUSTER;
-  const a          = core.getInput('action', { required: true });
-  const o          = core.getInput('origen', { required: false });
-  const d          = core.getInput('destino', { required: false });
-  const n          = core.getInput('namespace', { required: false });
-  const b          = core.getInput('branch', { required: false });
-  const an         = core.getInput('app_name', { required: false });
-  const r          = core.getInput('repo', { required: false });
-  const tg         = core.getInput('token', { required: false });
-  const de         = core.getInput('deployment', { required: false });
-  const github_ref = core.getInput('github_ref'. { required: false});
+  var gr   = process.env.GITHUB_REPOSITORY;
+  var c    = process.env.CLUSTER;
+  const a  = core.getInput('action', { required: true });
+  const o  = core.getInput('origen', { required: false });
+  const d  = core.getInput('destino', { required: false });
+  const n  = core.getInput('namespace', { required: false });
+  const b  = core.getInput('branch', { required: false });
+  const an = core.getInput('app_name', { required: false });
+  const r  = core.getInput('repo', { required: false });
+  const tg = core.getInput('token', { required: false });
+  const de = core.getInput('deployment', { required: false });
+  const gf = core.getInput('github_ref'. { required: false});
 
   const time = (new Date()).toTimeString();
   core.setOutput("time", time);
   if (a == "copyArtifacts") {copyDirectory(o,d)}
   if (a == "ConfPushECR") {ConfK8SPushEcr(c, n, b, an, r, tg)}
   if (a == "deployK8s") {deployK8s(n, r, de)}
-  if (a == "ToECR") {ToECR(github_ref, c, an, tg, r, b)}
+  if (a == "ToECR") {ToECR(gf, c, an, tg, r, b)}
   if (a == "default"){
     console.log(process.env);
   }
