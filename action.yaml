@@ -32,11 +32,15 @@ inputs:
   token:  
     description: 'Token github'
     required: false
-    default: 'xxxxxxx'
+    default: 'AAAAABBBBB'
   deployment:  
     description: 'Name deployment'
     required: false
-    default: 'xxxxxxx'
+    default: 'Wherever DEPLOY'
+  github_ref:  
+    description: 'Github REF'
+    required: false
+    default: 'v-0.0.0'
 outputs:
   time: # id of output
     description: 'The time we greeted you'
