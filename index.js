@@ -98,7 +98,7 @@ try {
   const r  = core.getInput('repo', { required: false });
   const tg = core.getInput('token', { required: false });
   const de = core.getInput('deployment', { required: false });
-  const gf = core.getInput('github_ref'. { required: false});
+  const gf = core.getInput('github_ref', { required: false});
 
   const time = (new Date()).toTimeString();
   core.setOutput("time", time);
