@@ -117,7 +117,7 @@ const kubernetes = async function(arreglo){
   const id_acount = identity.Account;
   sequentialExecution(
     "kubectl set image --record deployment.apps/"+ arreglo['deployment'] +" "+ arreglo['deployment'] +"="+ id_acount +".dkr.ecr."+ process.env.REGION +".amazonaws.com/"+ arreglo['ecr'] +":"+ arreglo['github_ref'] +" -n "+ arreglo['namespace'],
-    "kubectl rollout status deployment.apps/"+ arreglo['deployment'] +" -n "+ arreglo['nanespace'],
+    "kubectl rollout status deployment.apps/"+ arreglo['deployment'] +" -n "+ arreglo['namespace'],
   );
   return true;        
 }
