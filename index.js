@@ -39,14 +39,14 @@ try {
   var arreglo = [];
   var gr   = process.env.GITHUB_REPOSITORY;
   
-  const arreglo['action']       = core.getInput('action', { required: true });
-  const arreglo['namespace']    = core.getInput('namespace', { required: false });
-  const arreglo['branch']       = core.getInput('branch', { required: false });
-  const arreglo['ecr']          = core.getInput('ecr', { required: false });
-  const arreglo['token_github'] = core.getInput('token_github', { required: false });
-  const arreglo['deployment']   = core.getInput('deployment', { required: false });
-  const arreglo['github_ref']   = core.getInput('github_ref', { required: false});
-  const arreglo['cluster']      = core.getInput('cluster', { required: false});
+  arreglo['action']       = core.getInput('action', { required: true });
+  arreglo['namespace']    = core.getInput('namespace', { required: false });
+  arreglo['branch']       = core.getInput('branch', { required: false });
+  arreglo['ecr']          = core.getInput('ecr', { required: false });
+  arreglo['token_github'] = core.getInput('token_github', { required: false });
+  arreglo['deployment']   = core.getInput('deployment', { required: false });
+  arreglo['github_ref']   = core.getInput('github_ref', { required: false});
+  arreglo['cluster']      = core.getInput('cluster', { required: false});
 
   if ( arreglo['cluster'] == 'default' ) {
     arreglo['cluster'] = process.env.CLUSTER;
