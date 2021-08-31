@@ -88,7 +88,7 @@ const ecr = async function(arreglo){
   try {
     sequentialExecution(
       "aws eks update-kubeconfig --name "+ arreglo['cluster'] +" --region "+ process.env.REGION,
-      "kubectl run --rm kaniko-"+ arreglo['deployment'] +"-"+ arreglo['github_ref'] +" --attach=true --image=gcr.io/kaniko-project/executor:latest \
+      "kubectl run --rm kaniko-"+ arreglo['deployment'] +"-"+ arreglo['cluster'] +" --attach=true --image=gcr.io/kaniko-project/executor:latest \
         --serviceaccount="+ process.env.SERVICE_ACCOUNT +" --restart=Never -- \
         --verbosity=info \
         --context=git://"+ arreglo['token_github'] +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
