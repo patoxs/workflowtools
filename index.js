@@ -139,6 +139,9 @@ try {
   }
   if( arreglo['github_ref'] == '0.0.0' ) {
     arreglo['github_ref'] = process.env.GITHUB_SHA.slice(4, 14);
+  } else {
+    const words = arreglo['github_ref'].split('/');
+    arreglo['github_ref'] = words[2].split('"');
   }
 
   const time = (new Date()).toTimeString();
