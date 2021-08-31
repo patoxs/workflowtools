@@ -34,18 +34,99 @@ function copyDirectory(o,d){
   }
 }
 
-const ToECR = async function(github_ref, cluster, app_name, token, repo, branch){
+
+try {
+  var arreglo = [];
+  var gr   = process.env.GITHUB_REPOSITORY;
+  
+  const arreglo['action']       = core.getInput('action', { required: true });
+  const arreglo['namespace']    = core.getInput('namespace', { required: false });
+  const arreglo['branch']       = core.getInput('branch', { required: false });
+  const arreglo['ecr']          = core.getInput('ecr', { required: false });
+  const arreglo['token_github'] = core.getInput('token_github', { required: false });
+  const arreglo['deployment']   = core.getInput('deployment', { required: false });
+  const arreglo['github_ref']   = core.getInput('github_ref', { required: false});
+  const arreglo['cluster']      = core.getInput('cluster', { required: false});
+
+  if ( arreglo['cluster'] == 'default' ) {
+    arreglo['cluster'] = process.env.CLUSTER;
+  }
+  if( arreglo['github_ref'] == '0.0.0' ) {
+    arreglo['github_ref'] = process.env.GITHUB_SHA.slice(4, 14);
+  }
+
+  const time = (new Date()).toTimeString();
+
+  core.setOutput("time", time);
+
+  if (arreglo['action'] == "K8S") {K8S(n, r, de)}
+  if (arreglo['action'] == "ECR") {ECR(arreglo)}
+  if (arreglo['action'] == "Deploy") {Deploy(arreglo)}
+  if (arreglo['action'] == "default"){
+    console.log(process.env);
+  }
+} catch (error) {
+  core.setFailed(error.message);
+}
+
+/*
+- name: Deploy on cluster k8s
+        uses: patoxs/workflowtools@main
+        with: 
+          action: 'Deploy'
+          cluster: c
+          deployment: d
+          github_ref: gr
+          token_github: tk
+          ecr: ecr
+          branch: br
+          namespace: n
+*/
+const Deploy = async function(arreglo){
   const identity = await sts.getCallerIdentity().promise();
-  const id_count = identity.Account;
+  const id_acount = identity.Account;
   try {
     sequentialExecution(
-      "aws eks update-kubeconfig --name "+ cluster +" --region "+ process.env.REGION,
-      "kubectl run --rm kaniko-"+ app_name +"-"+ github_ref +" --attach=true --image=gcr.io/kaniko-project/executor:latest \
+      "aws eks update-kubeconfig --name "+ arreglo['cluster'] +" --region "+ process.env.REGION,
+      "kubectl run --rm kaniko-"+ arreglo['deployment'] +"-"+ arreglo['github_ref'] +" --attach=true --image=gcr.io/kaniko-project/executor:latest \
         --serviceaccount="+ process.env.SERVICE_ACCOUNT +" --restart=Never -- \
         --verbosity=info \
-        --context=git://"+ token +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
-        --destination="+ id_count +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":"+ github_ref +" \
-        --destination="+ id_count +".dkr.ecr.us-west-2.amazonaws.com/"+ repo +":latest --git=branch="+ branch
+        --context=git://"+ arreglo['token_github'] +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
+        --destination="+ id_acount +".dkr.ecr.us-west-2.amazonaws.com/"+ arreglo['ecr'] +":"+ github_ref +" \
+        --destination="+ id_acount +".dkr.ecr.us-west-2.amazonaws.com/"+ arreglo['ecr'] +":latest --git=branch="+ arreglo['branch'],
+      "kubectl set image --record deployment.apps/"+ arreglo['deployment'] +" "+ arreglo['deployment'] +"="+ id_acount +".dkr.ecr."+ process.env.REGION +".amazonaws.com/"+ arreglo['ecr'] +":"+ arreglo['github_ref'] +" -n "+ arreglo['namespace'],
+      "kubectl rollout status deployment.apps/"+ arreglo['deployment'] +" -n "+ arreglo['namespace'],
+    );
+    return true;
+  } catch (error) {
+    core.setFailed("Error al hacer el deploy");
+  }
+}
+
+/*
+- name: Push image to ECR
+        uses: patoxs/workflowtools@main
+        with: 
+          action: 'ECR'
+          cluster: c
+          deployment: d
+          github_ref: 324324
+          token_github: tg
+          ecr: e
+          branch: b
+*/
+const ECR = async function(arreglo){
+  const identity = await sts.getCallerIdentity().promise();
+  const id_acount = identity.Account;
+  try {
+    sequentialExecution(
+      "aws eks update-kubeconfig --name "+ arreglo['cluster'] +" --region "+ process.env.REGION,
+      "kubectl run --rm kaniko-"+ arreglo['deployment'] +"-"+ arreglo['github_ref'] +" --attach=true --image=gcr.io/kaniko-project/executor:latest \
+        --serviceaccount="+ process.env.SERVICE_ACCOUNT +" --restart=Never -- \
+        --verbosity=info \
+        --context=git://"+ arreglo['token_github'] +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
+        --destination="+ id_acount +".dkr.ecr.us-west-2.amazonaws.com/"+ arreglo['ecr'] +":"+ arreglo['github_ref'] +" \
+        --destination="+ id_acount +".dkr.ecr.us-west-2.amazonaws.com/"+ arreglo['ecr'] +":latest --git=branch="+ arreglo['branch']
     );
     return true;
   } catch (error) {
@@ -53,62 +134,22 @@ const ToECR = async function(github_ref, cluster, app_name, token, repo, branch)
   }
 }
 
-const ConfK8SPushEcr = async function(c, n, branch, app_name, repo, tg){
-  const tag = process.env.GITHUB_SHA.slice(4, 14);
+/*
+- name: Deploy image xxx to cluster kubernetes
+        uses: patoxs/workflowtools@main
+        with: 
+          action: 'K8S'
+          deployment: d
+          ecr: e
+          github_ref: 324324
+          namespace: na
+*/
+const K8S = async function(arreglo){
   const identity = await sts.getCallerIdentity().promise();
-  const ai = identity.Account;
-  try {
-    sequentialExecution(
-      "aws eks update-kubeconfig --name "+ c +" --region "+ process.env.REGION,
-      "kubectl run --rm kaniko-"+ app_name +"-"+ tag +" --attach=true --image=gcr.io/kaniko-project/executor:latest \
-        --serviceaccount="+ process.env.SERVICE_ACCOUNT +" --restart=Never -- \
-        --verbosity=debug \
-        --context=git://"+ tg +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
-        --context=git://"+ tg +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
-        --destination="+ ai +".dkr.ecr."+ process.env.REGION +".amazonaws.com/"+ repo +":"+ tag +" \
-        --destination="+ ai +".dkr.ecr."+ process.env.REGION +".amazonaws.com/"+ repo +":latest --git=branch="+ branch
-    );
-    return true;
-  } catch (error) {
-    core.setFailed(error.message);
-    return false;
-  }
-}
-
-const deployK8s = async function(n, repo, de){
-  const tag = process.env.GITHUB_SHA.slice(4, 14);
-  const identity = await sts.getCallerIdentity().promise();
-  const ai = identity.Account;
+  const id_acount = identity.Account;
   sequentialExecution(
-    "kubectl set image --record deployment.apps/"+ de +" "+ de +"="+ ai +".dkr.ecr."+ process.env.REGION +".amazonaws.com/"+ repo +":"+ tag +" -n "+ n,
-    "kubectl rollout status deployment.apps/"+ de +" -n "+ n,
+    "kubectl set image --record deployment.apps/"+ arreglo['deployment'] +" "+ arreglo['deployment'] +"="+ id_acount +".dkr.ecr."+ process.env.REGION +".amazonaws.com/"+ arreglo['ecr'] +":"+ arreglo['github_ref'] +" -n "+ arreglo['namespace'],
+    "kubectl rollout status deployment.apps/"+ arreglo['deployment'] +" -n "+ arreglo['nanespace'],
   );
   return true;        
-}
-
-try {
-  var gr   = process.env.GITHUB_REPOSITORY;
-  var c    = process.env.CLUSTER;
-  const a  = core.getInput('action', { required: true });
-  const o  = core.getInput('origen', { required: false });
-  const d  = core.getInput('destino', { required: false });
-  const n  = core.getInput('namespace', { required: false });
-  const b  = core.getInput('branch', { required: false });
-  const an = core.getInput('app_name', { required: false });
-  const r  = core.getInput('repo', { required: false });
-  const tg = core.getInput('token', { required: false });
-  const de = core.getInput('deployment', { required: false });
-  const gf = core.getInput('github_ref', { required: false});
-
-  const time = (new Date()).toTimeString();
-  core.setOutput("time", time);
-  if (a == "copyArtifacts") {copyDirectory(o,d)}
-  if (a == "ConfPushECR") {ConfK8SPushEcr(c, n, b, an, r, tg)}
-  if (a == "deployK8s") {deployK8s(n, r, de)}
-  if (a == "ToECR") {ToECR(gf, c, an, tg, r, b)}
-  if (a == "default"){
-    console.log(process.env);
-  }
-} catch (error) {
-  core.setFailed(error.message);
 }

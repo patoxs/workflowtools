@@ -2,34 +2,22 @@ name: 'WorkFlow Tools'
 description: 'Tools for deploy app using runner seft-hosted to infra AWS'
 inputs:
   action:  
-    description: 'Acción que define que actividad realizar'
+    description: 'Variable to define action to realice'
     required: true
     default: 'default'
-  origen:  
-    description: 'Directorio origen'
-    required: false
-    default: 'public'
-  destino:  
-    description: 'Directorio destino'
-    required: false
-    default: 'artefactos'
   namespace:  
-    description: 'Namespace app'
+    description: 'Namespace on cluster'
     required: false
     default: 'nombre-namespace'
   branch:  
-    description: 'Branch deploy'
+    description: 'Branch to deploy'
     required: false
     default: 'devel'
-  app_name:  
-    description: 'Name app'
-    required: false
-    default: 'app'
-  repo:  
-    description: 'Name repo'
+  ecr:  
+    description: 'Name repo ecr'
     required: false
     default: 'ecr'
-  token:  
+  token_github:  
     description: 'Token github'
     required: false
     default: 'AAAAABBBBB'
@@ -37,13 +25,18 @@ inputs:
     description: 'Name deployment'
     required: false
     default: 'Wherever DEPLOY'
+  cluster:  
+    description: 'Name cluster'
+    required: false
+    default: 'default'
   github_ref:  
     description: 'Github REF'
     required: false
-    default: 'v-0.0.0'
+    default: '0.0.0'
 outputs:
   time: # id of output
     description: 'The time we greeted you'
 runs:
   using: 'node12'
   main: 'index.js'
+
