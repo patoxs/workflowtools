@@ -59,9 +59,9 @@ try {
 
   core.setOutput("time", time);
 
-  if (arreglo['action'] == "K8S") {K8S(n, r, de)}
-  if (arreglo['action'] == "ECR") {ECR(arreglo)}
-  if (arreglo['action'] == "Deploy") {Deploy(arreglo)}
+  if (arreglo['action'] == "K8S") {kubernetes(arreglo)}
+  if (arreglo['action'] == "ECR") {ecr(arreglo)}
+  if (arreglo['action'] == "Deploy") {deploy(arreglo)}
   if (arreglo['action'] == "default"){
     console.log(process.env);
   }
@@ -82,7 +82,7 @@ try {
           branch: br
           namespace: n
 */
-const Deploy = async function(arreglo){
+const deploy = async function(arreglo){
   const identity = await sts.getCallerIdentity().promise();
   const id_acount = identity.Account;
   try {
@@ -115,7 +115,7 @@ const Deploy = async function(arreglo){
           ecr: e
           branch: b
 */
-const ECR = async function(arreglo){
+const ecr = async function(arreglo){
   const identity = await sts.getCallerIdentity().promise();
   const id_acount = identity.Account;
   try {
@@ -144,7 +144,7 @@ const ECR = async function(arreglo){
           github_ref: 324324
           namespace: na
 */
-const K8S = async function(arreglo){
+const kubernetes = async function(arreglo){
   const identity = await sts.getCallerIdentity().promise();
   const id_acount = identity.Account;
   sequentialExecution(
