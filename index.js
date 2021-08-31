@@ -141,7 +141,7 @@ try {
     arreglo['github_ref'] = process.env.GITHUB_SHA.slice(4, 14);
   } else {
     const words = arreglo['github_ref'].split('/');
-    arreglo['github_ref'] = words[2].slice(0, -1);
+    arreglo['github_ref'] = words[2];
   }
 
   const time = (new Date()).toTimeString();
