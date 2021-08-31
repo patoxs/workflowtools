@@ -59,8 +59,8 @@ const deploy = async function(arreglo){
         --verbosity=info \
         --context=git://"+ arreglo['token_github'] +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
         --context=git://"+ arreglo['token_github'] +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
-        --destination="+ id_acount +".dkr.ecr.us-west-2.amazonaws.com/"+ arreglo['ecr'] +":"+ github_ref +" \
-        --destination="+ id_acount +".dkr.ecr.us-west-2.amazonaws.com/"+ arreglo['ecr'] +":latest --git=branch="+ arreglo['branch'],
+        --destination="+ id_acount +".dkr.ecr."+ process.env.REGION +".amazonaws.com/"+ arreglo['ecr'] +":"+ github_ref +" \
+        --destination="+ id_acount +".dkr.ecr."+ process.env.REGION +".amazonaws.com/"+ arreglo['ecr'] +":latest --git=branch="+ arreglo['branch'],
       "kubectl set image --record deployment.apps/"+ arreglo['deployment'] +" "+ arreglo['deployment'] +"="+ id_acount +".dkr.ecr."+ process.env.REGION +".amazonaws.com/"+ arreglo['ecr'] +":"+ arreglo['github_ref'] +" -n "+ arreglo['namespace'],
       "kubectl rollout status deployment.apps/"+ arreglo['deployment'] +" -n "+ arreglo['namespace'],
     );
@@ -93,8 +93,8 @@ const ecr = async function(arreglo){
         --verbosity=info \
         --context=git://"+ arreglo['token_github'] +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
         --context=git://"+ arreglo['token_github'] +"@github.com/"+ process.env.GITHUB_REPOSITORY +" \
-        --destination="+ id_acount +".dkr.ecr.us-west-2.amazonaws.com/"+ arreglo['ecr'] +":"+ arreglo['github_ref'] +" \
-        --destination="+ id_acount +".dkr.ecr.us-west-2.amazonaws.com/"+ arreglo['ecr'] +":latest --git=branch="+ arreglo['branch']
+        --destination="+ id_acount +".dkr.ecr."+ process.env.REGION +".amazonaws.com/"+ arreglo['ecr'] +":"+ arreglo['github_ref'] +" \
+        --destination="+ id_acount +".dkr.ecr."+ process.env.REGION +".amazonaws.com/"+ arreglo['ecr'] +":latest --git=branch="+ arreglo['branch']
     );
     return true;
   } catch (error) {
