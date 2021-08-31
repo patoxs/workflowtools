@@ -140,9 +140,8 @@ try {
   if( arreglo['github_ref'] == '0.0.0' ) {
     arreglo['github_ref'] = process.env.GITHUB_SHA.slice(4, 14);
   } else {
-    console.log(arreglo['github_ref']);
     const words = arreglo['github_ref'].split('/');
-    arreglo['github_ref'] = words[2].split('"');
+    arreglo['github_ref'] = words[2].slice(0, -1);
   }
 
   const time = (new Date()).toTimeString();
