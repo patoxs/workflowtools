@@ -35,40 +35,6 @@ function copyDirectory(o,d){
 }
 
 
-try {
-  var arreglo = [];
-  var gr   = process.env.GITHUB_REPOSITORY;
-  
-  arreglo['action']       = core.getInput('action', { required: true });
-  arreglo['namespace']    = core.getInput('namespace', { required: false });
-  arreglo['branch']       = core.getInput('branch', { required: false });
-  arreglo['ecr']          = core.getInput('ecr', { required: false });
-  arreglo['token_github'] = core.getInput('token_github', { required: false });
-  arreglo['deployment']   = core.getInput('deployment', { required: false });
-  arreglo['github_ref']   = core.getInput('github_ref', { required: false});
-  arreglo['cluster']      = core.getInput('cluster', { required: false});
-
-  if ( arreglo['cluster'] == 'default' ) {
-    arreglo['cluster'] = process.env.CLUSTER;
-  }
-  if( arreglo['github_ref'] == '0.0.0' ) {
-    arreglo['github_ref'] = process.env.GITHUB_SHA.slice(4, 14);
-  }
-
-  const time = (new Date()).toTimeString();
-
-  core.setOutput("time", time);
-
-  if (arreglo['action'] == "K8S") {kubernetes(arreglo)}
-  if (arreglo['action'] == "ECR") {ecr(arreglo)}
-  if (arreglo['action'] == "Deploy") {deploy(arreglo)}
-  if (arreglo['action'] == "default"){
-    console.log(process.env);
-  }
-} catch (error) {
-  core.setFailed(error.message);
-}
-
 /*
 - name: Deploy on cluster k8s
         uses: patoxs/workflowtools@main
@@ -153,3 +119,39 @@ const kubernetes = async function(arreglo){
   );
   return true;        
 }
+
+
+try {
+  var arreglo = [];
+  var gr   = process.env.GITHUB_REPOSITORY;
+  
+  arreglo['action']       = core.getInput('action', { required: true });
+  arreglo['namespace']    = core.getInput('namespace', { required: false });
+  arreglo['branch']       = core.getInput('branch', { required: false });
+  arreglo['ecr']          = core.getInput('ecr', { required: false });
+  arreglo['token_github'] = core.getInput('token_github', { required: false });
+  arreglo['deployment']   = core.getInput('deployment', { required: false });
+  arreglo['github_ref']   = core.getInput('github_ref', { required: false});
+  arreglo['cluster']      = core.getInput('cluster', { required: false});
+
+  if ( arreglo['cluster'] == 'default' ) {
+    arreglo['cluster'] = process.env.CLUSTER;
+  }
+  if( arreglo['github_ref'] == '0.0.0' ) {
+    arreglo['github_ref'] = process.env.GITHUB_SHA.slice(4, 14);
+  }
+
+  const time = (new Date()).toTimeString();
+
+  core.setOutput("time", time);
+
+  if (arreglo['action'] == "K8S") {kubernetes(arreglo)}
+  if (arreglo['action'] == "ECR") {ecr(arreglo)}
+  if (arreglo['action'] == "Deploy") {deploy(arreglo)}
+  if (arreglo['action'] == "default"){
+    console.log(process.env);
+  }
+} catch (error) {
+  core.setFailed(error.message);
+}
+
