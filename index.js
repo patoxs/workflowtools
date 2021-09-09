@@ -142,7 +142,7 @@ try {
   if( arreglo['github_ref'] == '0.0.0' ) {
     arreglo['github_ref'] = process.env.GITHUB_SHA.slice(4, 14);
   } else {
-    const words = arreglo['github_ref'].split('/');
+    const words = process.env.GITHUB_REF.split('/');
     arreglo['github_ref'] = words[2];
   }
 
@@ -159,4 +159,3 @@ try {
 } catch (error) {
   core.setFailed(error.message);
 }
-
